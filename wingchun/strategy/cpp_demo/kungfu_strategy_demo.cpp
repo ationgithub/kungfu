@@ -5,7 +5,9 @@
  */
 
 #include "IWCStrategy.h"
+#include "Timer.h"
 #include <deque>
+#include <iostream>
 
 USING_WC_NAMESPACE
 
@@ -45,7 +47,15 @@ public:
 
 public:
     Strategy(const string& name);
+
+    friend void callback_func_demo(Strategy*, int);
 };
+
+void callback_func_demo(Strategy* str, int param)
+{
+    std::cout << "ready to start!" << std::endl;
+    KF_LOG_INFO(str->logger, "ready to start! test for param: " << param);
+}
 
 Strategy::Strategy(const string& name): IWCStrategy(name)
 {
@@ -74,6 +84,8 @@ void Strategy::init()
     signal.has_open_long_position = false;
     signal.has_open_short_position = false;
     signal.trade_size = 1;
+    BLCallback bl = boost::bind(callback_func_demo, this, 999);
+    util->insert_callback(kungfu::yijinjing::getNanoTime() + 2* 1e9, bl);
 }
 
 void Strategy::on_rsp_position(const PosHandlerPtr posMap, int request_id, short source, long rcv_time)

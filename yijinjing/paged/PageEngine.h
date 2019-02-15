@@ -93,7 +93,7 @@ public:
     /** default constructor */
     PageEngine();
     /** default destructor */
-    ~PageEngine();
+    virtual ~PageEngine();
 
     /** start paged service, mainly start tasks */
     void start();
@@ -134,11 +134,11 @@ private:
     KfLogPtr logger;    /**< logger */
     void*   commBuffer; /**< comm memory */
     string  commFile;   /**< comm file linked to memory */
-    int     maxIdx;     /**< max index of current assigned comm block */
+    size_t  maxIdx;     /**< max index of current assigned comm block */
     int     microsecFreq;  /**< task frequency in microseconds */
     bool    task_running;  /**< task thread is running */
-    bool    comm_running;  /**< comm buffer checking thread is running */
     long    last_switch_nano; /**< last switch day nano time */
+    volatile bool    comm_running;  /**< comm buffer checking thread is running */
 
     /** thread for task running */
     ThreadPtr taskThread;

@@ -25,6 +25,8 @@
 #define WINGCHUN_ENGINEUTIL_H
 
 #include "WC_DECLARE.h"
+#include "longfist/LFConstants.h"
+#include "longfist/LFUtils.h"
 
 /*                                                                    +-------------+
  *                                                          (Fail) -> | ConnectFail |
@@ -78,6 +80,8 @@ class EngineUtil
 public:
     static inline void splitTicker(const char* ticker, char* commodityNo, char* contractNo);
     static const char* gbkErrorMsg2utf8(const char* errorMsg);
+    static short getExchangeIdFromStockTicker(const char* ticker);
+    static string getExchangeNameFromStockTicker(const char* ticker);
 };
 
 inline void EngineUtil::splitTicker(const char* ticker, char* commodityNo, char* contractNo)
@@ -92,6 +96,31 @@ inline void EngineUtil::splitTicker(const char* ticker, char* commodityNo, char*
     strncpy(commodityNo, ticker, i);
     strcpy(contractNo, &ticker[i]);
 };
+
+inline short EngineUtil::getExchangeIdFromStockTicker(const char* ticker)
+{
+    switch (ticker[0])
+    {
+        case '0': // 000 - A stock; 002 - 中小板; 080 - 配股; 031 - 权证
+        case '1': // funds of sz
+        case '2': // 200 - B stock
+        case '3': // 300 - 创业板
+            return EXCHANGE_ID_SZE;
+        case '5': // fund of sh, etc
+        case '6': // 600/601 - A stock
+        case '7': // 730 - new stock; 700 - 配股
+        case '9': // 900 - B stock
+            return EXCHANGE_ID_SSE;
+        default: // 4,8 新三板
+            return -1;
+    }
+}
+
+inline string EngineUtil::getExchangeNameFromStockTicker(const char* ticker)
+{
+    short exchange_id = getExchangeIdFromStockTicker(ticker);
+    return getExchangeName(exchange_id);
+}
 
 WC_NAMESPACE_END
 
